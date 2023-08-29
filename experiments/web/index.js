@@ -2,20 +2,34 @@ async function doBluetooth(serviceName, characteristicName) {
     const device = await window.navigator.bluetooth.requestDevice({
         // filters: [{ services: ['battery_service'] }]
         acceptAllDevices: true,
-        optionalServices: [serviceName]
+        // optionalServices: [serviceName]
     })
+    console.log(device)
     const server = await device.gatt.connect()
     console.log(server)
-    const service = await server.getPrimaryService(serviceName)
-    console.log(service)
-    const characteristic = await service.getCharacteristic(characteristicName)
-    console.log(characteristic)
-    const manufacturerNameDataView = await characteristic.readValue()
-    console.log(manufacturerNameDataView)
-    const decoder = new TextDecoder()
-    const manufacturerName = decoder.decode(manufacturerNameDataView.buffer)
-    console.log(manufacturerName)
-    return device
+
+    const services = await server.getPrimaryServices()
+    console.log(services)
+    console.log(services.map(s => s.uuid))
+
+    const characteristics = await services[0].getCharacteristics()
+    console.log(characteristics)
+    console.log(characteristics.map(c => c.properties))
+    console.log(characteristics.map(c => c.uuid))
+    console.log(characteristics.map(c => c.value))
+
+    const dataView = await characteristics[0].readValue()
+    console.log(dataView)
+
+    // For string values
+    // const decoder = new TextDecoder()
+    // const value = decoder.decode(dataView.buffer)
+
+    // For numeric values
+    const value = dataView.getUint8(0)
+    console.log(value)
+
+    return value
 }
 
 const btn = document.querySelector('#search-btn')
@@ -34,6 +48,6 @@ btn.addEventListener('click', _event => {
     const characteristic = characteristicSelect.options[characteristicSelect.selectedIndex].value
     console.log(`Searching for service: ${service}, characteristic: ${characteristic}`)
     doBluetooth(service, characteristic)
-        .then(d => console.log(d))
+        .then(value => console.log(value))
 })
 
