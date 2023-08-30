@@ -12,14 +12,14 @@ async function doBluetooth(operation, allServicesNames, serviceName, characteris
         // Uncaught (in promise) DOMException: Origin is not allowed to access any service. Tip: Add the service UUID to 'optionalServices' in requestDevice() options. https://goo.gl/HxfxSQ
         const services = await server.getPrimaryServices()
         console.log(services)
-        console.log(services.map(s => s.uuid))
+        console.log(services.map(s => allServices[s.uuid.toLowerCase()]))
     } else if (operation === "all-chars-of-service") {
         const service = await server.getPrimaryService(serviceName)
         console.log(service)
         const characteristics = await service.getCharacteristics()
         console.log(characteristics)
         console.log(characteristics.map(c => c.properties))
-        console.log(characteristics.map(c => c.uuid))
+        console.log(characteristics.map(c => allCharacteristics[c.uuid.toLowerCase()]))
         console.log(characteristics.map(c => c.value))
     } else if (operation === "char-of-service") {
         const service = await server.getPrimaryService(serviceName)
@@ -61,3 +61,19 @@ btn.addEventListener('click', _event => {
     doBluetooth(operation, services, service, characteristic)
 })
 
+
+"00001805-0000-1000-8000-00805f9b34fb"
+"0000180f-0000-1000-8000-00805f9b34fb"
+"0000180a-0000-1000-8000-00805f9b34fb"
+
+"0000180a-0000-1000-8000-00805f9b34fb"
+[
+    "00002a23-0000-1000-8000-00805f9b34fb",
+    "00002a24-0000-1000-8000-00805f9b34fb",
+    "00002a26-0000-1000-8000-00805f9b34fb",
+    "00002a27-0000-1000-8000-00805f9b34fb",
+    "00002a28-0000-1000-8000-00805f9b34fb",
+    "00002a29-0000-1000-8000-00805f9b34fb",
+    "00002a2a-0000-1000-8000-00805f9b34fb",
+    "00002a50-0000-1000-8000-00805f9b34fb"
+]
