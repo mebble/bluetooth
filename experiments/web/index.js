@@ -4,39 +4,41 @@ async function doBluetooth(operation, allServicesNames, serviceName, characteris
         acceptAllDevices: true,
         optionalServices: allServicesNames
     })
-    console.log(device)
+    console.log(`[device=${device.name}] connecting to GATT server`)
     const server = await device.gatt.connect()
     console.log(server)
 
     if (operation === "all-services") {
+        console.log(`[device=${device.name}] getting all primary services`)
         // Uncaught (in promise) DOMException: Origin is not allowed to access any service. Tip: Add the service UUID to 'optionalServices' in requestDevice() options. https://goo.gl/HxfxSQ
         const services = await server.getPrimaryServices()
         console.log(services)
         console.log(services.map(s => allServices[s.uuid.toLowerCase()]))
     } else if (operation === "all-chars-of-service") {
+        console.log(`[device=${device.name}][service=${serviceName}] getting primary service`)
         const service = await server.getPrimaryService(serviceName)
         console.log(service)
+        console.log(`[device=${device.name}][service=${serviceName}] getting all characteristics`)
         const characteristics = await service.getCharacteristics()
         console.log(characteristics)
         console.log(characteristics.map(c => c.properties))
         console.log(characteristics.map(c => allCharacteristics[c.uuid.toLowerCase()]))
         console.log(characteristics.map(c => c.value))
     } else if (operation === "char-of-service") {
+        console.log(`[device=${device.name}][service=${serviceName}] getting primary service`)
         const service = await server.getPrimaryService(serviceName)
         console.log(service)
+        console.log(`[device=${device.name}][service=${serviceName}][characteristic=${characteristicName}] getting characteristic`)
         const characteristic = await service.getCharacteristic(characteristicName)
         console.log(characteristic)
 
         const dataView = await characteristic.readValue()
         console.log(dataView)
 
-        // For string values
-        // const decoder = new TextDecoder()
-        // const value = decoder.decode(dataView.buffer)
+        const decoder = new TextDecoder()
+        const [stringValue, numericValue] = [decoder.decode(dataView.buffer), dataView.getUint8(0)]
 
-        // For numeric values
-        const value = dataView.getUint8(0)
-        console.log(value)
+        console.log(stringValue, numericValue)
     }
 }
 
@@ -60,20 +62,3 @@ btn.addEventListener('click', _event => {
     console.log(`operation: ${operation}, service: ${service}, characteristic: ${characteristic}`)
     doBluetooth(operation, services, service, characteristic)
 })
-
-
-"00001805-0000-1000-8000-00805f9b34fb"
-"0000180f-0000-1000-8000-00805f9b34fb"
-"0000180a-0000-1000-8000-00805f9b34fb"
-
-"0000180a-0000-1000-8000-00805f9b34fb"
-[
-    "00002a23-0000-1000-8000-00805f9b34fb",
-    "00002a24-0000-1000-8000-00805f9b34fb",
-    "00002a26-0000-1000-8000-00805f9b34fb",
-    "00002a27-0000-1000-8000-00805f9b34fb",
-    "00002a28-0000-1000-8000-00805f9b34fb",
-    "00002a29-0000-1000-8000-00805f9b34fb",
-    "00002a2a-0000-1000-8000-00805f9b34fb",
-    "00002a50-0000-1000-8000-00805f9b34fb"
-]
